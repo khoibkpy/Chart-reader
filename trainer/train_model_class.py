@@ -12,7 +12,7 @@ from torchvision import transforms
 from sklearn.metrics import precision_recall_fscore_support, confusion_matrix, accuracy_score
 
 try:
-    from chart_class_model import SimpleChartCNN as OriginalSimpleChartCNN, get_data_transform as original_transform
+    from pipeline.chart_class_model import SimpleChartCNN as OriginalSimpleChartCNN, get_data_transform as original_transform
 except ImportError:
     print("Lỗi: Không tìm thấy file 'chart_class_model.py'.")
     sys.exit(1)

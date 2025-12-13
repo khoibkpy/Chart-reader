@@ -1,0 +1,28 @@
+{
+  "best": {
+    "tolerance": 8.0,
+    "small_ratio": 0.2,
+    "aggressive_top_k": 1,
+    "refine_color": true,
+    "dominant_frac_thresh": 0.8,
+    "dominant_color_tol": 36.0,
+    "bg_tol": 20.0,
+    "result": [
+      {
+        "image": "my_images\\bar2.png",
+        "boxes": 4,
+        "classes": 1,
+        "target_boxes": 15,
+        "target_classes": 3
+      },
+      {
+        "image": "my_images\\bar1.jpg",
+        "boxes": 9,
+        "classes": 2,
+        "target_boxes": 12,
+        "target_classes": 2
+      }
+    ]
+  },
+  "score": 16
+}

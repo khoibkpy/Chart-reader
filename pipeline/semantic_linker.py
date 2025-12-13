@@ -228,6 +228,12 @@ class SemanticLinker:
                 class_name_map[cls] = mapped_name
                 used_legend_idxs.add(mapped_idx)
 
+        # If we only found one legend mapping, apply it to all classes
+        if len(class_name_map) == 1:
+            only_name = list(class_name_map.values())[0]
+            for cls in list(class_groups.keys()):
+                class_name_map[cls] = only_name
+
         # Build final bar results and attach class name
         # Determine which boxes are legend swatches (smallest per class)
         legend_bboxes = set()
@@ -236,6 +242,23 @@ class SemanticLinker:
 
         # Chart boxes = boxes that are not legend swatches
         chart_boxes = [b for b in bar_objects if tuple(b['bbox']) not in legend_bboxes]
+
+        # Collect any OCR text not used for legend mapping or title as additional info
+        used_legend_texts = set()
+        for i in used_legend_idxs:
+            if 0 <= i < len(legend_candidates):
+                used_legend_texts.add(legend_candidates[i].get('text'))
+
+        additional_info = []
+        for it in ocr_items:
+            txt = it.get('text')
+            if not txt:
+                continue
+            if txt == chart_title:
+                continue
+            if txt in used_legend_texts:
+                continue
+            additional_info.append(txt)
 
         # Ox axis Y is median bottom Y of chart boxes
         if chart_boxes:
@@ -329,5 +352,6 @@ class SemanticLinker:
         return {
             'chart_title': chart_title,
             'class_map': class_name_map,
-            'bars': final_results
+            'bars': final_results,
+            'additional_info': additional_info
         }

@@ -9,9 +9,9 @@ ocr_engine = PaddleOCR(
     lang='en'
 )
 
-OUTPUT_JSON_DIR = './output_json'
-OUTPUT_IMAGE_DIR = './output_process'
-POSTFIX_TO_DELETE = 'preprocessed_img.jpg'
+OUTPUT_JSON_DIR = './output_ocr'
+OUTPUT_IMAGE_DIR = './output_ocr'
+POSTFIX_TO_DELETE = 'preprocessed_img.png'
 
 def extract_text_and_boxes(image_path):
     if not os.path.exists(image_path):
@@ -85,6 +85,5 @@ def extract_text_and_boxes(image_path):
                     file_to_delete = os.path.join(OUTPUT_IMAGE_DIR, filename)
                     os.remove(file_to_delete)
         except Exception as e:
-            print(f"Lỗi khi dọn dẹp thư mục output_image: {e}")
-
+            print(f"Lỗi khi dọn dẹp thư mục output_visual: {e}")
     return useful_data

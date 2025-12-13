@@ -1,3 +1,8 @@
 chart_classifier_model.pth
 /graphs
 /my_images
+/output_ocr
+/pipeline/__pycache__
+/output_image
+/output_json
+/output_process

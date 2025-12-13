@@ -1,28 +1,26 @@
-from chart_class_model import load_model_and_predict
-from bar_chart_ocr import extract_text_and_boxes
-from bar_chart_shape import detect_and_refine
-from semantic_linker import SemanticLinker
+from pipeline.chart_class_model import load_model_and_predict
+from pipeline.bar_chart_ocr import extract_text_and_boxes
+from pipeline.bar_chart_shape import detect_and_refine
+from pipeline.semantic_linker import SemanticLinker
 import json
 import os
 
 SAVED_MODEL_PATH = 'chart_classifier_model.pth'
 IMAGE_TO_TEST = './my_images/bar_chart.jpg'
 def process(image_path=IMAGE_TO_TEST, run_ocr=True, run_shape=True):
-    print(f"--- 1. Phân loại Ảnh ---")
+    print(f"--- Phân loại Ảnh ---")
     print(f"Đang tải ảnh: {image_path}")
 
     label, confidence = load_model_and_predict(image_path, SAVED_MODEL_PATH)
 
-    print(f"\n--- Kết quả Phân loại ---")
-    print(f"Dự đoán: {label}")
-    print(f"Độ tin cậy: {confidence:.2f}%")
+    print(f"\nKết quả Phân loại: {label} với độ tin cậy {confidence:.2f}%")
 
     combined = []
     vis_path = None
     if run_shape:
         out_dir = os.path.join(os.getcwd(), "output_image")
         os.makedirs(out_dir, exist_ok=True)
-        combined, vis_path = detect_and_refine(image_path, refine_color=True, tolerance=40, visual=True, output_dir=out_dir)
+        combined, vis_path = detect_and_refine(image_path, refine_color=True, debug=False)
         if vis_path:
             print(f"Hình minh họa cuối cùng đã lưu tại: {vis_path}")
         else:
@@ -41,7 +39,6 @@ def process(image_path=IMAGE_TO_TEST, run_ocr=True, run_shape=True):
     else:
         print("\n--- OCR bị tắt bởi cấu hình ---")
 
-    # Semantic linking: only if we have both shape and OCR results
     if run_shape and run_ocr and combined and ocr_results:
         linker = SemanticLinker()
         linked = linker.link_bar_chart(ocr_results, combined)
@@ -51,7 +48,6 @@ def process(image_path=IMAGE_TO_TEST, run_ocr=True, run_shape=True):
                 print(f"Chart Title: {title}")
             bars = linked.get('bars', [])
 
-            # Build JSON output using semantic linker results
             chart_name = os.path.basename(image_path)
             metadata = {
                 "chart_type": "Bar Chart (Vertical)",
@@ -62,13 +58,11 @@ def process(image_path=IMAGE_TO_TEST, run_ocr=True, run_shape=True):
             for it in bars:
                 category = it.get('label') or it.get('class_name') or "Unknown"
                 value = it.get('value')
-                # try to coerce numeric values
                 try:
                     if value is None:
                         value_num = 0
                     else:
                         value_num = float(value)
-                        # represent as int if whole
                         if abs(value_num - int(value_num)) < 1e-9:
                             value_num = int(value_num)
                 except Exception:
@@ -85,7 +79,7 @@ def process(image_path=IMAGE_TO_TEST, run_ocr=True, run_shape=True):
                 "raw_data_table": raw_data_table
             }
 
-            out_dir = os.path.join(os.getcwd(), "output_image")
+            out_dir = os.path.join(os.getcwd(), "output_json")
             os.makedirs(out_dir, exist_ok=True)
             out_name = os.path.splitext(chart_name)[0] + ".json"
             out_path = os.path.join(out_dir, out_name)
@@ -101,6 +95,8 @@ def process(image_path=IMAGE_TO_TEST, run_ocr=True, run_shape=True):
 
 if __name__ == '__main__':
     image_array = [
+        './my_images/bar_chart.jpg',
+        './my_images/bar1.jpg',
         './my_images/bar2.png',
         './my_images/bar3.png',
         './my_images/bar4.png',

@@ -86,7 +86,6 @@ def load_model_and_predict(image_path, model_path):
         except Exception:
             labels = [str(i) for i in range(len(probs_list))]
         probs_repr = ", ".join([f"{lab}: {p*100:.2f}%" for lab, p in zip(labels, probs_list)])
-        print(f"Per-class probabilities -> {probs_repr}")
         
     prediction_label = LABELS_MAP.get(prediction_idx, 'Unknown')
     
